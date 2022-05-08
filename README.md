@@ -1,4 +1,4 @@
-# world-clock-widget
+# World Clock Widget
 
 The missing world clock widget for Übersicht.
 
