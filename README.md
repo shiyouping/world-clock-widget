@@ -1,2 +1,5 @@
 # world-clock-widget
-A world clock widget for Übersicht
+
+The missing world clock widget for Übersicht.
+
+![World Clock](/screenshot.png)
