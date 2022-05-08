@@ -1,18 +1,5 @@
 import { css } from "uebersicht";
 
-/************** Options **************/
-const fontColor = "white";
-const itemPadding = "10px";
-const backgroundColor = "rgba(0, 0, 0, 0)";
-const borderColor = "rgba(255, 255, 255, 0.1)";
-const timeFontSize = "35px";
-const cityFontSize = "20px";
-const timezoneFontSize = "10px";
-const cities = [
-  { name: "London", timezone: "Europe/London" },
-  { name: "New York", timezone: "America/New_York" },
-];
-
 /** TimeZone List
 [
   "Africa/Abidjan",
@@ -457,6 +444,19 @@ const cities = [
 ]
 */
 
+/************** Options **************/
+const fontColor = "white";
+const itemPadding = "10px";
+const backgroundColor = "rgba(0, 0, 0, 0)";
+const borderColor = "rgba(255, 255, 255, 0.1)";
+const timeFontSize = "35px";
+const cityFontSize = "20px";
+const timezoneFontSize = "10px";
+const cities = [
+  { name: "London", timezone: "Europe/London" },
+  { name: "New York", timezone: "America/New_York" },
+];
+
 // Widget will refresh every one minute
 export const refreshFrequency = 60 * 1000;
 
@@ -466,27 +466,51 @@ export const render = ({ output, error }) => {
       Something went wrong: <strong>{String(error)}</strong>
     </div>
   ) : (
-    <div className={container}>
-      <div className={leftItem}>
-        <div className={timezone}>Today, +8HRS</div>
-        <div className={city}>Hong Kong</div>
-      </div>
-      <div className={rightItem}>17:26</div>
+    cities.map((currentCity) => {
+      const now = new Date();
+      const date = changeTimezone(now, currentCity.timezone);
+      const dayDiff = getDayDiff(now, date);
+      const hourDiff = getHourDiff(now, date);
 
-      <div className={leftItem}>
-        <div className={timezone}>Today, +8HRS</div>
-        <div className={city}>Hong Kong</div>
-      </div>
-      <div className={rightItem}>17:26</div>
-
-      <div className={leftItem}>
-        <div className={timezone}>Today, +8HRS</div>
-        <div className={city}>Hong Kong</div>
-      </div>
-      <div className={rightItem}>17:26</div>
-    </div>
+      return (
+        <div className={container}>
+          <div className={leftItem}>
+            <div className={timezone}>
+              {dayDiff}, {hourDiff}
+            </div>
+            <div className={city}>{currentCity.name}</div>
+          </div>
+          <div className={rightItem}>
+            {padZero(date.getHours(), 2)}:{padZero(date.getMinutes(), 2)}
+          </div>
+        </div>
+      );
+    })
   );
 };
+
+const getDayDiff = (now, date) => {
+  const dateDiff = date.getDate() - now.getDate();
+
+  if (dateDiff == 0) {
+    return "Today";
+  } else if (dateDiff < 0) {
+    return "Yesterday";
+  } else {
+    return "Tomorrow";
+  }
+};
+
+const getHourDiff = (now, date) => {
+  const hourDiff = Number((date.getTime() - now.getTime()) / 3600000).toFixed(
+    1
+  );
+
+  const unit = hourDiff === 1 || hourDiff === -1 ? "Hour" : "Hours";
+  return hourDiff >= 0 ? `+${hourDiff} ${unit}` : `${hourDiff} ${unit}`;
+};
+
+const padZero = (num, places) => String(num).padStart(places, "0");
 
 const changeTimezone = (date, ianatz) => {
   // suppose the date is 12:00 UTC
@@ -517,7 +541,7 @@ const leftItem = css`
   color: ${fontColor};
   padding: ${itemPadding};
   border: 1px solid ${borderColor};
-  border-style: solid none solid none;
+  border-style: none none solid none;
   text-align: left;
 `;
 
@@ -528,7 +552,7 @@ const rightItem = css`
   color: ${fontColor};
   padding: ${itemPadding};
   border: 1px solid ${borderColor};
-  border-style: solid none solid none;
+  border-style: none none solid none;
   text-align: right;
 `;
 
