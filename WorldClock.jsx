@@ -445,29 +445,26 @@ import { css } from "uebersicht";
 */
 
 /************** UI Settings **************/
-// The font color
 const fontColor = "white";
-
-const itemPadding = "10px";
-
-// The cities to be shown
+const itemPadding = "5px";
 const cities = [
-  { name: "London", timezone: "Europe/London" },
   { name: "New York", timezone: "America/New_York" },
+  { name: "London", timezone: "Europe/London" },
   { name: "Amman", timezone: "Asia/Amman" },
+  { name: "Hong Kong", timezone: "Asia/Hong_Kong" },
+  { name: "Sydney", timezone: "Australia/Sydney" },
 ];
 
-// The position and font
 export const className = `
-	left: 35px;
-	top: 35px;
+	left: 510px;
+	top: 300px;
 	font-family: Helvetica;
 	z-index: 1;
 `;
 /************** UI Settings **************/
 
 // How often command will be executed
-export const refreshFrequency = 1000 * 15; // Every 15 seconds
+export const refreshFrequency = 1000 * 15;
 
 // Trigger UI refresh
 export const command = (dispatch) => {
@@ -514,12 +511,15 @@ const getDayDiff = (now, date) => {
 };
 
 const getHourDiff = (now, date) => {
-  const hourDiff = Number((date.getTime() - now.getTime()) / 3600000).toFixed(
-    1
-  );
+  let hourDiff = Number((date.getTime() - now.getTime()) / 3600000).toFixed(1);
 
-  const unit = hourDiff === 1 || hourDiff === -1 ? "Hour" : "Hours";
-  return hourDiff >= 0 ? `+${hourDiff} ${unit}` : `${hourDiff} ${unit}`;
+  if (hourDiff == 0) {
+    hourDiff = 0;
+  }
+
+  const unit =
+    hourDiff == 0 || hourDiff == 1 || hourDiff == -1 ? "Hour" : "Hours";
+  return hourDiff > 0 ? `+${hourDiff} ${unit}` : `${hourDiff} ${unit}`;
 };
 
 const padZero = (num, places) => String(num).padStart(places, "0");
@@ -552,7 +552,7 @@ const leftItem = css`
 const rightItem = css`
   grid-column-start: 3;
   grid-column-end: 4;
-  font-size: 35px;
+  font-size: 30px;
   color: ${fontColor};
   padding: ${itemPadding};
   border: 0 none;
@@ -566,5 +566,5 @@ const timezone = css`
 `;
 
 const city = css`
-  font-size: 20px;
+  font-size: 16px;
 `;
