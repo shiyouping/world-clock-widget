@@ -444,49 +444,56 @@ import { css } from "uebersicht";
 ]
 */
 
-/************** Options **************/
+/************** UI Settings **************/
 const fontColor = "white";
 const itemPadding = "10px";
-const backgroundColor = "rgba(0, 0, 0, 0)";
-const borderColor = "rgba(255, 255, 255, 0.1)";
-const timeFontSize = "35px";
-const cityFontSize = "20px";
-const timezoneFontSize = "10px";
 const cities = [
   { name: "London", timezone: "Europe/London" },
   { name: "New York", timezone: "America/New_York" },
+  { name: "Amman", timezone: "Asia/Amman" },
 ];
 
-// Widget will refresh every one minute
-export const refreshFrequency = 60 * 1000;
+export const className = `
+	left: 35px;
+	top: 35px;
+	font-family: Helvetica;
+	z-index: 1;
+`;
+/************** UI Settings **************/
 
-export const render = ({ output, error }) => {
-  return error ? (
-    <div>
-      Something went wrong: <strong>{String(error)}</strong>
-    </div>
-  ) : (
-    cities.map((currentCity) => {
-      const now = new Date();
-      const date = changeTimezone(now, currentCity.timezone);
-      const dayDiff = getDayDiff(now, date);
-      const hourDiff = getHourDiff(now, date);
+// How often command will be executed
+export const refreshFrequency = 1000 * 30;
 
-      return (
-        <div className={container}>
-          <div className={leftItem}>
-            <div className={timezone}>
-              {dayDiff}, {hourDiff}
-            </div>
-            <div className={city}>{currentCity.name}</div>
+// Trigger UI refresh
+export const command = (dispatch) => {
+  dispatch({ output: new Date() });
+};
+
+export const updateState = (event, previousState) => {
+  return event;
+};
+
+export const render = ({ output }) => {
+  return cities.map((currentCity) => {
+    const now = new Date();
+    const date = changeTimezone(now, currentCity.timezone);
+    const dayDiff = getDayDiff(now, date);
+    const hourDiff = getHourDiff(now, date);
+
+    return (
+      <div className={container}>
+        <div className={leftItem}>
+          <div className={timezone}>
+            {dayDiff}, {hourDiff}
           </div>
-          <div className={rightItem}>
-            {padZero(date.getHours(), 2)}:{padZero(date.getMinutes(), 2)}
-          </div>
+          <div className={city}>{currentCity.name}</div>
         </div>
-      );
-    })
-  );
+        <div className={rightItem}>
+          {padZero(date.getHours(), 2)}:{padZero(date.getMinutes(), 2)}
+        </div>
+      </div>
+    );
+  });
 };
 
 const getDayDiff = (now, date) => {
@@ -512,27 +519,20 @@ const getHourDiff = (now, date) => {
 
 const padZero = (num, places) => String(num).padStart(places, "0");
 
-const changeTimezone = (date, ianatz) => {
-  // suppose the date is 12:00 UTC
+const changeTimezone = (date, newTimeZone) => {
   const invdate = new Date(
     date.toLocaleString("en-US", {
-      timeZone: ianatz,
+      timeZone: newTimeZone,
     })
   );
 
-  // then invdate will be 07:00 in Toronto
-  // and the diff is 5 hours
   const diff = date.getTime() - invdate.getTime();
-
-  // so 12:00 in Toronto is 17:00 UTC
-  return new Date(date.getTime() - diff); // needs to substract
+  return new Date(date.getTime() - diff);
 };
 
 const container = css`
   display: grid;
   grid-template-columns: auto auto auto;
-  background-color: ${backgroundColor};
-  font-family: Montserrat, sans-serif;
 `;
 
 const leftItem = css`
@@ -540,28 +540,26 @@ const leftItem = css`
   grid-column-end: 3;
   color: ${fontColor};
   padding: ${itemPadding};
-  border: 1px solid ${borderColor};
-  border-style: none none solid none;
+  border: 0 none;
   text-align: left;
 `;
 
 const rightItem = css`
   grid-column-start: 3;
   grid-column-end: 4;
-  font-size: ${timeFontSize};
+  font-size: 35px;
   color: ${fontColor};
   padding: ${itemPadding};
-  border: 1px solid ${borderColor};
-  border-style: none none solid none;
+  border: 0 none;
   text-align: right;
 `;
 
 const timezone = css`
   color: ${fontColor};
-  font-size: ${timezoneFontSize};
+  font-size: 10px;
   padding: 0 0 5px 0;
 `;
 
 const city = css`
-  font-size: ${cityFontSize};
+  font-size: 20px;
 `;
