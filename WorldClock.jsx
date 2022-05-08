@@ -445,14 +445,19 @@ import { css } from "uebersicht";
 */
 
 /************** UI Settings **************/
+// The font color
 const fontColor = "white";
+
 const itemPadding = "10px";
+
+// The cities to be shown
 const cities = [
   { name: "London", timezone: "Europe/London" },
   { name: "New York", timezone: "America/New_York" },
   { name: "Amman", timezone: "Asia/Amman" },
 ];
 
+// The position and font
 export const className = `
 	left: 35px;
 	top: 35px;
@@ -462,7 +467,7 @@ export const className = `
 /************** UI Settings **************/
 
 // How often command will be executed
-export const refreshFrequency = 1000 * 30;
+export const refreshFrequency = 1000 * 15; // Every 15 seconds
 
 // Trigger UI refresh
 export const command = (dispatch) => {
