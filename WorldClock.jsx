@@ -1,5 +1,131 @@
 import { css } from "uebersicht";
 
+/************** UI Settings **************/
+const fontColor = "white";
+const itemPadding = "5px";
+const cities = [
+  // See the bottom for the full list of time zones
+  { name: "New York", timezone: "America/New_York" },
+  { name: "London", timezone: "Europe/London" },
+  { name: "Amman", timezone: "Asia/Amman" },
+  { name: "Hong Kong", timezone: "Asia/Hong_Kong" },
+  { name: "Sydney", timezone: "Australia/Sydney" },
+];
+
+export const className = `
+	left: 650px;
+	top: 240px;
+	font-family: Helvetica;
+	z-index: 1;
+`;
+/************** UI Settings **************/
+
+// How often command will be executed
+export const refreshFrequency = 1000 * 15;
+
+// Trigger UI refresh
+export const command = (dispatch) => {
+  dispatch({ output: new Date() });
+};
+
+export const updateState = (event, previousState) => {
+  return event;
+};
+
+export const render = ({ output }) => {
+  return cities.map((currentCity) => {
+    const now = new Date();
+    const date = changeTimezone(now, currentCity.timezone);
+    const dayDiff = getDayDiff(now, date);
+    const hourDiff = getHourDiff(now, date);
+
+    return (
+      <div className={container}>
+        <div className={leftItem}>
+          <div className={timezone}>
+            {dayDiff}, {hourDiff}
+          </div>
+          <div className={city}>{currentCity.name}</div>
+        </div>
+        <div className={rightItem}>
+          {padZero(date.getHours(), 2)}:{padZero(date.getMinutes(), 2)}
+        </div>
+      </div>
+    );
+  });
+};
+
+const getDayDiff = (now, date) => {
+  const dateDiff = date.getDate() - now.getDate();
+
+  if (dateDiff == 0) {
+    return "Today";
+  } else if (dateDiff < 0) {
+    return "Yesterday";
+  } else {
+    return "Tomorrow";
+  }
+};
+
+const getHourDiff = (now, date) => {
+  let hourDiff = Number((date.getTime() - now.getTime()) / 3600000).toFixed(1);
+
+  if (hourDiff == 0) {
+    hourDiff = 0;
+  }
+
+  const unit =
+    hourDiff == 0 || hourDiff == 1 || hourDiff == -1 ? "Hour" : "Hours";
+  return hourDiff > 0 ? `+${hourDiff} ${unit}` : `${hourDiff} ${unit}`;
+};
+
+const padZero = (num, places) => String(num).padStart(places, "0");
+
+const changeTimezone = (date, newTimeZone) => {
+  const invdate = new Date(
+    date.toLocaleString("en-US", {
+      timeZone: newTimeZone,
+    })
+  );
+
+  const diff = date.getTime() - invdate.getTime();
+  return new Date(date.getTime() - diff);
+};
+
+const container = css`
+  display: grid;
+  grid-template-columns: auto auto auto;
+`;
+
+const leftItem = css`
+  grid-column-start: 1;
+  grid-column-end: 3;
+  color: ${fontColor};
+  padding: ${itemPadding};
+  border: 0 none;
+  text-align: left;
+`;
+
+const rightItem = css`
+  grid-column-start: 3;
+  grid-column-end: 4;
+  font-size: 30px;
+  color: ${fontColor};
+  padding: ${itemPadding};
+  border: 0 none;
+  text-align: right;
+`;
+
+const timezone = css`
+  color: ${fontColor};
+  font-size: 10px;
+  padding: 0 0 5px 0;
+`;
+
+const city = css`
+  font-size: 16px;
+`;
+
 /** TimeZone List
 [
   "Africa/Abidjan",
@@ -443,128 +569,3 @@ import { css } from "uebersicht";
   "Pacific/Wallis"
 ]
 */
-
-/************** UI Settings **************/
-const fontColor = "white";
-const itemPadding = "5px";
-const cities = [
-  { name: "New York", timezone: "America/New_York" },
-  { name: "London", timezone: "Europe/London" },
-  { name: "Amman", timezone: "Asia/Amman" },
-  { name: "Hong Kong", timezone: "Asia/Hong_Kong" },
-  { name: "Sydney", timezone: "Australia/Sydney" },
-];
-
-export const className = `
-	left: 510px;
-	top: 300px;
-	font-family: Helvetica;
-	z-index: 1;
-`;
-/************** UI Settings **************/
-
-// How often command will be executed
-export const refreshFrequency = 1000 * 15;
-
-// Trigger UI refresh
-export const command = (dispatch) => {
-  dispatch({ output: new Date() });
-};
-
-export const updateState = (event, previousState) => {
-  return event;
-};
-
-export const render = ({ output }) => {
-  return cities.map((currentCity) => {
-    const now = new Date();
-    const date = changeTimezone(now, currentCity.timezone);
-    const dayDiff = getDayDiff(now, date);
-    const hourDiff = getHourDiff(now, date);
-
-    return (
-      <div className={container}>
-        <div className={leftItem}>
-          <div className={timezone}>
-            {dayDiff}, {hourDiff}
-          </div>
-          <div className={city}>{currentCity.name}</div>
-        </div>
-        <div className={rightItem}>
-          {padZero(date.getHours(), 2)}:{padZero(date.getMinutes(), 2)}
-        </div>
-      </div>
-    );
-  });
-};
-
-const getDayDiff = (now, date) => {
-  const dateDiff = date.getDate() - now.getDate();
-
-  if (dateDiff == 0) {
-    return "Today";
-  } else if (dateDiff < 0) {
-    return "Yesterday";
-  } else {
-    return "Tomorrow";
-  }
-};
-
-const getHourDiff = (now, date) => {
-  let hourDiff = Number((date.getTime() - now.getTime()) / 3600000).toFixed(1);
-
-  if (hourDiff == 0) {
-    hourDiff = 0;
-  }
-
-  const unit =
-    hourDiff == 0 || hourDiff == 1 || hourDiff == -1 ? "Hour" : "Hours";
-  return hourDiff > 0 ? `+${hourDiff} ${unit}` : `${hourDiff} ${unit}`;
-};
-
-const padZero = (num, places) => String(num).padStart(places, "0");
-
-const changeTimezone = (date, newTimeZone) => {
-  const invdate = new Date(
-    date.toLocaleString("en-US", {
-      timeZone: newTimeZone,
-    })
-  );
-
-  const diff = date.getTime() - invdate.getTime();
-  return new Date(date.getTime() - diff);
-};
-
-const container = css`
-  display: grid;
-  grid-template-columns: auto auto auto;
-`;
-
-const leftItem = css`
-  grid-column-start: 1;
-  grid-column-end: 3;
-  color: ${fontColor};
-  padding: ${itemPadding};
-  border: 0 none;
-  text-align: left;
-`;
-
-const rightItem = css`
-  grid-column-start: 3;
-  grid-column-end: 4;
-  font-size: 30px;
-  color: ${fontColor};
-  padding: ${itemPadding};
-  border: 0 none;
-  text-align: right;
-`;
-
-const timezone = css`
-  color: ${fontColor};
-  font-size: 10px;
-  padding: 0 0 5px 0;
-`;
-
-const city = css`
-  font-size: 16px;
-`;
